@@ -1,0 +1,759 @@
+{
+  "name": "zero-heat-super-compute",
+  "displayName": "Zero Heat Super Compute -- AWS Partner",
+  "version": "16.4.0",
+  "description": "J&K Advanced Technologies -- AWS certified partner. 19-tool enterprise compute suite: Maxion V16 thermal performance engine, Diamonize LSA zero-trust security, Quezar AES-256-GCM encrypted storage, Lineage.0 VC (4K AI video + commercial images via Amazon Nova). Per-tool card licensing via Gumroad.",
+  "icon": "https://jk-advanced-tech-web.s3.us-east-2.amazonaws.com/maxion-icon.svg",
+  "homepage": "https://advancedapparchitect.com",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "licenseKey": {
+        "type": "string",
+        "title": "Gumroad License Key",
+        "description": "Optional. License key from your Gumroad purchase receipt (Maxion, Diamonize, Quezar, or Lineage.0). Leave blank for the free 30-minute trial."
+      }
+    },
+    "required": []
+  },
+  "tools": [
+    {
+      "name": "engine.maxion.activate",
+      "title": "Activate Maxion V16",
+      "description": "Activates Maxion V16 and returns live host telemetry: CPU brand, core count, current load, memory usage, and CPU package temperature (where the OS exposes a sensor).",
+      "annotations": {
+        "title": "Activate Maxion V16",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "duration_minutes": {
+            "type": "number",
+            "description": "How long to keep the engine active, in minutes."
+          }
+        },
+        "required": [
+          "duration_minutes"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "cpu": {
+            "type": "string"
+          },
+          "cores": {
+            "type": "integer"
+          },
+          "load_percent": {
+            "type": "number"
+          },
+          "memory_used_gb": {
+            "type": "number"
+          },
+          "memory_total_gb": {
+            "type": "number"
+          },
+          "temperature_c": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "engine.maxion.deactivate",
+      "title": "Deactivate Maxion V16",
+      "description": "Ends the active Maxion V16 telemetry session.",
+      "annotations": {
+        "title": "Deactivate Maxion V16",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "engine.maxion.status",
+      "title": "Maxion V16 Status",
+      "description": "Returns Maxion V16's current CPU load and CPU package temperature from the host system.",
+      "annotations": {
+        "title": "Maxion V16 Status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "load_percent": {
+            "type": "number"
+          },
+          "temperature_c": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "name": "engine.maxion.diagnostics",
+      "title": "Maxion V16 Diagnostics",
+      "description": "Runs a Maxion V16 diagnostic pass: CPU brand, core count, and total memory for the host system.",
+      "annotations": {
+        "title": "Maxion V16 Diagnostics",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "deep_scan": {
+            "type": "boolean",
+            "description": "When true, runs extended diagnostics in addition to standard checks."
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "cpu_brand": {
+            "type": "string"
+          },
+          "cores": {
+            "type": "integer"
+          },
+          "memory_total_gb": {
+            "type": "number"
+          },
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "security.diamonize.scan",
+      "title": "Diamonize Security Scan",
+      "description": "Runs a Diamonize security scan: computes the SHA-256 hash and byte size of a target file, or returns active RAM and process counts for the literal 'SYSTEM_MEMORY'.",
+      "annotations": {
+        "title": "Diamonize Security Scan",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Absolute file path to scan, or the literal string 'SYSTEM_MEMORY' to scan active RAM."
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "size_bytes": {
+            "type": "integer"
+          },
+          "threats_found": {
+            "type": "integer"
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "CLEAN",
+              "THREAT_DETECTED"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "security.diamonize.quarantine",
+      "title": "Diamonize Quarantine",
+      "description": "Records a file or process path as quarantined in Diamonize and returns a confirmation. Advisory only; does not move or modify the file.",
+      "annotations": {
+        "title": "Diamonize Quarantine",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Absolute file path or process name to record as quarantined."
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "QUARANTINED"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "security.diamonize.logs",
+      "title": "Diamonize Security Logs",
+      "description": "Returns recent Diamonize security event log entries for the current session.",
+      "annotations": {
+        "title": "Diamonize Security Logs",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "description": "Number of recent log entries to return (default 10, max 100)."
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "event": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "security.diamonize.status",
+      "title": "Diamonize Scanner Status",
+      "description": "Returns the Diamonize security scanner status and the timestamp of the last scan.",
+      "annotations": {
+        "title": "Diamonize Scanner Status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "shield_active": {
+            "type": "boolean"
+          },
+          "zero_trust_enabled": {
+            "type": "boolean"
+          },
+          "last_sweep": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    {
+      "name": "storage.quezar.store",
+      "title": "Store Data in Quezar",
+      "description": "Encrypts and stores a payload in the Quezar Quantum Vault using AES-256-GCM. Returns a Vault ID for retrieval.",
+      "annotations": {
+        "title": "Store Data in Quezar",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "string",
+            "description": "Plain-text data to encrypt and store. Accepts any string up to 10 MB."
+          }
+        },
+        "required": [
+          "payload"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Vault_id": {
+            "type": "string"
+          },
+          "encryption": {
+            "type": "string",
+            "const": "AES-256-GCM"
+          }
+        },
+        "required": [
+          "Vault_id"
+        ]
+      }
+    },
+    {
+      "name": "storage.quezar.retrieve",
+      "title": "Retrieve Quezar Data",
+      "description": "Decrypts and retrieves a payload from the Quezar Quantum Vault by Vault ID.",
+      "annotations": {
+        "title": "Retrieve Quezar Data",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "Vault_id": {
+            "type": "string",
+            "description": "The Vault ID returned when the data was stored."
+          }
+        },
+        "required": [
+          "Vault_id"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Vault_id": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "storage.quezar.delete",
+      "title": "Delete Quezar Record",
+      "description": "Permanently purges a record from the Quezar Quantum Vault.",
+      "annotations": {
+        "title": "Delete Quezar Record",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "Vault_id": {
+            "type": "string",
+            "description": "The Vault ID of the record to permanently delete."
+          }
+        },
+        "required": [
+          "Vault_id"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Vault_id": {
+            "type": "string"
+          },
+          "purged": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    {
+      "name": "storage.quezar.list",
+      "title": "List Quezar Sectors",
+      "description": "Lists all encrypted sector IDs currently stored in the Quezar Quantum Vault.",
+      "annotations": {
+        "title": "List Quezar Sectors",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "sector_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "name": "storage.quezar.status",
+      "title": "Quezar Storage Status",
+      "description": "Quezar telemetry: sector count, vault size, and encryption stats.",
+      "annotations": {
+        "title": "Quezar Storage Status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "online": {
+            "type": "boolean"
+          },
+          "sector_count": {
+            "type": "integer"
+          },
+          "encryption": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "media.lineage0.generate",
+      "title": "Generate AI Video or Image",
+      "description": "4K AI video via Amazon Nova Reel 1.1 or commercial-ready images via Nova Canvas. Polls until synthesis completes and returns a presigned download URL. If you don't yet have a Lineage.0 license, pass duration_seconds and this tool immediately returns the exact Gumroad checkout link for that length -- no separate billing.purchase call needed.",
+      "annotations": {
+        "title": "Generate AI Video or Image",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "video",
+              "image"
+            ],
+            "description": "Output format: 'video' for 4K Nova Reel 1.1 synthesis, 'image' for Nova Canvas commercial-grade image."
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Natural-language description of the desired video or image content."
+          },
+          "duration_seconds": {
+            "type": "string",
+            "enum": [
+              "6",
+              "12",
+              "18",
+              "24",
+              "30",
+              "36",
+              "42",
+              "48",
+              "54",
+              "60",
+              "66",
+              "72",
+              "78",
+              "84"
+            ],
+            "description": "Required for video when you don't yet hold a Lineage.0 license: one of 6-84 seconds (6-second steps). Determines which fixed-price tier's checkout link is returned."
+          }
+        },
+        "required": [
+          "media_type",
+          "prompt"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "video",
+              "image"
+            ]
+          },
+          "expires_in_seconds": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url",
+          "media_type"
+        ]
+      }
+    },
+    {
+      "name": "media.lineage0.status",
+      "title": "Lineage.0 Cluster Status",
+      "description": "Real-time status of the Lineage.0 Nova synthesis cluster and S3 vault.",
+      "annotations": {
+        "title": "Lineage.0 Cluster Status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "nova_reel": {
+            "type": "string"
+          },
+          "nova_canvas": {
+            "type": "string"
+          },
+          "s3_bucket": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "media.lineage0.archive",
+      "title": "Lineage.0 Media Archive",
+      "description": "Lists recently synthesized Lineage.0 multimedia artifacts from the AWS S3 vault.",
+      "annotations": {
+        "title": "Lineage.0 Media Archive",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "size_kb": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "name": "billing.purchase",
+      "title": "Get Trial or Purchase License",
+      "description": "Returns a Gumroad checkout link. Maxion: $2.50/hr or $20/mo. Diamonize: $20/mo only (no hourly). Quezar: $9.99/mo only (no hourly), includes 25GB pre-compressed storage. Lineage.0: pay-per-video consumable credit — fixed-price tiers at 6s ($0.99), 12s ($1.68), 18s ($2.52), 24s ($3.36), 30s ($4.20), 36s ($5.04), 42s ($5.88), 48s ($6.72), 54s ($7.56), 60s ($8.40), 66s ($9.24), 72s ($10.08), 78s ($10.92), 84s ($11.76).",
+      "annotations": {
+        "title": "Get Trial or Purchase License",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tool_name": {
+            "type": "string",
+            "enum": [
+              "maxion",
+              "diamonize",
+              "quezar",
+              "lineage0"
+            ],
+            "description": "The tool namespace to license."
+          },
+          "duration": {
+            "type": "string",
+            "description": "For maxion: 'trial' (free 30 min), 'hourly' ($2.50), or 'monthly' ($20). For diamonize/quezar: 'trial' or 'monthly' only ($20/mo and $9.99/mo respectively -- no hourly tier). For lineage0: number of seconds as a string, one of the fixed-price tier durations as a string: '6', '12', '18', '24', '30', '36', '42', '48', '54', '60', '66', '72', '78', or '84' (seconds). Each purchase is a single consumable video credit."
+          }
+        },
+        "required": [
+          "tool_name",
+          "duration"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "checkout_url": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "billing.activate",
+      "title": "Activate Gumroad License Key",
+      "description": "After completing a Gumroad purchase, call this with your product_permalink and license_key to verify and activate your access. For Lineage.0, the key is consumed after one successful video generation.",
+      "annotations": {
+        "title": "Activate Gumroad License Key",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_permalink": {
+            "type": "string",
+            "description": "The Gumroad product permalink (e.g. 'quezar-monthly')."
+          },
+          "license_key": {
+            "type": "string",
+            "description": "The license key from your Gumroad purchase email."
+          }
+        },
+        "required": [
+          "product_permalink",
+          "license_key"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "tool": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "gateway.status",
+      "title": "Gateway System Status",
+      "description": "Holistic health overview: all 19 tools, current license status, billing info, and Quezar vault statistics.",
+      "annotations": {
+        "title": "Gateway System Status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "fleet_key_active": {
+            "type": "boolean"
+          },
+          "tool_count": {
+            "type": "integer"
+          },
+          "lineage0_status": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ]
+}
